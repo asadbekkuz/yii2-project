@@ -12,9 +12,10 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        'homeUrl' => '/',
         'request' => [
+            'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',
-            'baseUrl' =>''
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -37,14 +38,31 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'login'=> 'site/login',
+                'logout'=> 'site/logout',
+//                'product/<controller:\w+>/<action:[\w-]+>/<id:\d+>' => 'product/<controller>/<action>',
+//                '<controller:\w+>/<id:\d+>' => '<controller>/view',
+//                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+//                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ],
         ],
-
+        'assetManager' => [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
+                    'js'=>[]
+                ],
+                'yii\bootstrap\BootstrapPluginAsset' => [
+                    'js'=>[]
+                ],
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [],
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];
