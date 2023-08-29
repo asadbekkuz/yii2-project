@@ -35,10 +35,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'first_name',
             'last_name',
             'middle_name',
-            //'gender',
-            //'birth_date',
-            //'registered_at',
-            //'status',
+            'gender',
+            'birth_date',
+            'registered_at',
+            'status',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Customer $model, $key, $index, $column) {

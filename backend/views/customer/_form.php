@@ -8,30 +8,104 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="customer-form">
+<div class="customer-form row">
+    <div class="card card-primary col-md-12">
+        <div class="card-header ">
+            <h3 class="card-title">Create Customer</h3>
+        </div>
+        <?php $form = ActiveForm::begin(); ?>
+        <div class="card-body row">
+        <div class="col-md-6">
 
-    <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'customer_user_id')->textInput() ?>
+        <div class="form-group">
 
-    <?= $form->field($model, 'first_name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'first_name', [
+                'template' => '{label}{input}{error}',
+                'labelOptions' => [
+                    'for' => 'firstname'
+                ],
+                'inputOptions' => [
+                    'id' => 'firstname',
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter First Name'
+                ]
 
-    <?= $form->field($model, 'last_name')->textInput(['maxlength' => true]) ?>
+            ])->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'middle_name')->textInput(['maxlength' => true]) ?>
+        </div>
 
-    <?= $form->field($model, 'gender')->textInput(['maxlength' => true]) ?>
+        <div class="form-group">
 
-    <?= $form->field($model, 'birth_date')->textInput() ?>
+            <?= $form->field($model, 'last_name', [
+                'template' => '{label}{input}{error}',
+                'labelOptions' => [
+                    'for' => 'lastname'
+                ],
+                'inputOptions' => [
+                    'id' => 'lastname',
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter Last Name'
+                ]
 
-    <?= $form->field($model, 'registered_at')->textInput() ?>
+            ])->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->textInput() ?>
+        </div>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
+        <div class="form-group">
+
+            <?= $form->field($model, 'middle_name', [
+                'template' => '{label}{input}{error}',
+                'labelOptions' => [
+                    'for' => 'middlename'
+                ],
+                'inputOptions' => [
+                    'id' => 'middlename',
+                    'class' => 'form-control',
+                    'placeholder' => 'Enter Middle Name'
+                ]
+
+            ])->textInput(['maxlength' => true]) ?>
+
+        </div>
+
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="custom-control custom-radio">
+
+                        <?= $form->field($model, 'gender')->label('Gender')->radioList([
+                            0 =>'Male',
+                            1 =>'Female',
+                        ])  ?>
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+
+                <?= $form->field($model, 'status')->dropDownList([
+                    '0' => 'Active',
+                    '1' => 'Inactive',
+                    '2'=>'Deleted'
+                ]); ?>
+                </div>
+
+            </div>
+            <?= $form->field($model, 'birth_date')->textInput() ?>
+
+            <?= $form->field($model, 'registered_at')->textInput() ?>
+
+        </div>
+        <div class="form-group">
+            <?= Html::submitButton('Create', ['class' => 'btn btn-primary']) ?>
+        </div>
 
     <?php ActiveForm::end(); ?>
-
+        </div>
+    </div>
 </div>
+
