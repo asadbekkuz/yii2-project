@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\query\CategoryQuery;
 use Yii;
 
 /**
@@ -17,6 +18,8 @@ use Yii;
  */
 class Category extends \yii\db\ActiveRecord
 {
+    const CATEGORY_ACTIVE = 1;
+    const CATEGORY_INACTIVE = 0;
     /**
      * {@inheritdoc}
      */
@@ -60,4 +63,11 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Product::class, ['category_id' => 'id']);
     }
+
+    public static function find()
+    {
+        return (new CategoryQuery(get_called_class()));
+    }
+
+
 }

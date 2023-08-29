@@ -1,5 +1,9 @@
 <?php
 
+use common\models\Brand;
+use common\models\Category;
+use common\models\Product;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -12,34 +16,59 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="col-lg-6">
+            <?= $form->field($model, 'title')->textInput(['maxlength' => true])->label('<span style="color:red">*</span> Title') ?>
+        </div>
+        <div class="col-lg-6">
+            <?= $form->field($model, 'SKU')->textInput(['maxlength' => true])->label('<span style="color:red">*</span> SKU') ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'desc_list')->textarea(['rows' => 6]) ?>
+    <div class="row">
+        <div class="col-lg-6">
+            <?= $form->field($model, 'specification')->textInput()->label('<span style="color:red">*</span> Specification') ?>
+        </div>
+        <div class="col-lg-6">
+            <?= $form->field($model, 'status')->dropDownList(Product::getProductStatusLabels())->label("<span style='color:red'>*</span> Status") ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+    <div class="row">
+        <div class="col-lg-6">
+            <?= $form->field($model, 'price')->textInput()->label('<span style="color:red">*</span> Price') ?>
+        </div>
+        <div class="col-lg-6">
+            <?= $form->field($model, 'new_price')->textInput() ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'category_id')->textInput() ?>
+    <div class="row">
+        <div class="col-lg-6">
+            <?= $form->field($model, 'category_id')->dropDownList(
+                    ArrayHelper::map(Category::find()->active()->all(),'id','name'),[
+                            'prompt' => 'Select category...'
+                ]
+            )->label('<span style="color:red">*</span> Category') ?>
+        </div>
+        <div class="col-lg-6">
+            <?= $form->field($model, 'brand_id')->dropDownList(
+                ArrayHelper::map(Brand::find()->active()->all(),'id','name'),[
+                    'prompt' => 'Select brand...'
+                ]
+            )->label('<span style="color:red">*</span> Brand') ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'brand_id')->textInput() ?>
+    <?= $form->field($model, 'desc_list')->textarea(['rows' => 4,'style' => ['resize'=>'none']]) ?>
 
-    <?= $form->field($model, 'SKU')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'specification')->textInput() ?>
-
-    <?= $form->field($model, 'status')->textInput() ?>
-
-    <?= $form->field($model, 'price')->textInput() ?>
-
-    <?= $form->field($model, 'new_price')->textInput() ?>
-
-    <?= $form->field($model, 'created_at')->textInput() ?>
-
-    <?= $form->field($model, 'updated_at')->textInput() ?>
-
-    <?= $form->field($model, 'deleted_at')->textInput() ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 4,'style' => ['resize'=>'none']]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('<i class="far fa-save"></i>&nbsp&nbsp'.Yii::t('app', 'Save'), [
+            'class' => 'btn btn-warning',
+            'id' => 'saveButton'
+        ]) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

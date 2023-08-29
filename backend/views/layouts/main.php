@@ -50,7 +50,11 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <?= $this->render('footer') ?>
 </div>
 
-<?php $this->endBody() ?>
+<?php
+
+$this->endBody();
+$this->registerJsFile('@web/js/app.js');
+?>
 </body>
 </html>
 <?php $this->endPage() ?>

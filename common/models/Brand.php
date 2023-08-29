@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\query\BrandQuery;
 use Yii;
 
 /**
@@ -17,6 +18,9 @@ use Yii;
  */
 class Brand extends \yii\db\ActiveRecord
 {
+
+    const BRAND_ACTIVE = 1;
+    const BRAND_INACTIVE = 0;
     /**
      * {@inheritdoc}
      */
@@ -60,4 +64,14 @@ class Brand extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Product::class, ['brand_id' => 'id']);
     }
+
+    /**
+     * @return BrandQuery
+     */
+    public static function find()
+    {
+        return (new BrandQuery(get_called_class()));
+    }
+
+
 }

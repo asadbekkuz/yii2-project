@@ -2,33 +2,31 @@
 
 namespace backend\controllers;
 
+use Yii;
 use common\models\Product;
 use common\models\ProductSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * ProductController implements the CRUD actions for Product model.
  */
 class ProductController extends Controller
 {
+    /** @var Product  */
+    private Product $_product;
+
     /**
-     * @inheritDoc
+     * Create product object for all of controller's actions
+     *
+     * @return void
      */
-    public function behaviors()
+    public function init()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
-            ]
-        );
+        parent::init();
+        if(empty($this->_product)){
+            $this->_product = new Product();
+        }
     }
 
     /**
@@ -63,23 +61,29 @@ class ProductController extends Controller
     /**
      * Creates a new Product model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return array|string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Product();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $response['status'] = false;
+            if ($this->request->isPost) {
+                if ($this->_product->load($this->request->post())) {
+                    if($this->_product->save()) {
+                        $response['status'] = true;
+                    }else{
+                        $response['error'] = $this->_product->getFirstErrors();
+                    }
+                }else{
+                    $response['error'] = $this->_product->getAttributes();
+                }
             }
-        } else {
-            $model->loadDefaultValues();
+            $response['content'] = $this->renderAjax('create', ['model' => $this->_product]);
+            return $response;
+        }else{
+            return $this->redirect('index');
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**

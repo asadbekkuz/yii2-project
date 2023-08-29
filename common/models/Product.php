@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\models\query\ProductQuery;
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\bootstrap4\Html;
 
 /**
  * This is the model class for table "product".
@@ -33,12 +36,23 @@ use Yii;
  */
 class Product extends \yii\db\ActiveRecord
 {
+    const PRODUCT_INACTIVE = 0;
+    const PRODUCT_ACTIVE = 1;
+    const PRODUCT_DELETED = 2;
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'product';
+    }
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class
+            ]
+        ];
     }
 
     /**
@@ -70,7 +84,7 @@ class Product extends \yii\db\ActiveRecord
             'description' => 'Description',
             'category_id' => 'Category ID',
             'brand_id' => 'Brand ID',
-            'SKU' => 'Sku',
+            'SKU' => 'SKU',
             'specification' => 'Specification',
             'status' => 'Status',
             'price' => 'Price',
@@ -160,4 +174,24 @@ class Product extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Review::class, ['product_id' => 'id']);
     }
+
+    /**
+     *  Get status label
+     * @return array
+     */
+    public static function getProductStatusLabels(): array
+    {
+        return [
+            self::PRODUCT_ACTIVE => 'ACTIVE',
+            self::PRODUCT_INACTIVE => 'INACTIVE',
+            self::PRODUCT_DELETED => 'DELETED',
+        ];
+    }
+
+    public static function find()
+    {
+        return (new ProductQuery(get_called_class()));
+    }
+
+
 }
