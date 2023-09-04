@@ -4,9 +4,13 @@ namespace backend\controllers;
 
 use common\models\Favorite;
 use common\models\FavoriteSearch;
+use Yii;
+use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\web\UploadedFile;
 
 /**
  * FavoriteController implements the CRUD actions for Favorite model.
@@ -18,17 +22,15 @@ class FavoriteController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
+        return [
             [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
+                'class' => ContentNegotiator::class,
+                'only' => ['create', 'update', 'view'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON
+                ]
             ]
-        );
+        ];
     }
 
     /**
@@ -50,56 +52,55 @@ class FavoriteController extends Controller
     /**
      * Displays a single Favorite model.
      * @param int $id ID
-     * @return string
+     * @return array
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $response['status'] = false;
+        $response['content'] = $this->renderAjax('view', ['model' => $this->findModel($id)]);
+        return $response;
     }
 
     /**
      * Creates a new Favorite model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return array|string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Favorite();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            $response['status'] = false;
+            if ($this->request->isPost) {
+                if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                    $response['status'] = true;
+                }
+                $response['content'] = $this->renderAjax('create', ['model' => $model]);
             }
+            return $response;
         } else {
-            $model->loadDefaultValues();
+            return "Invalid request";
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**
      * Updates an existing Favorite model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return array|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $response['status'] = false;
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $response['status'] = true;
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        $response['content'] = $this->renderAjax('update', ['model' => $model]);
+        return $response;
     }
 
     /**
@@ -112,7 +113,6 @@ class FavoriteController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
 

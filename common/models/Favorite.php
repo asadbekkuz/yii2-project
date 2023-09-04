@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "favorite".
@@ -23,6 +24,16 @@ class Favorite extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'favorite';
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'added_at'
+            ]
+        ];
     }
 
     /**

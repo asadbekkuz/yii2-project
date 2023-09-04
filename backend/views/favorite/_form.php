@@ -1,5 +1,9 @@
 <?php
 
+use common\models\Category;
+use common\models\Customer;
+use common\models\Product;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -10,16 +14,22 @@ use yii\widgets\ActiveForm;
 
 <div class="favorite-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'method' => 'post',
+        'id' => 'saveForm',
+        'options' => ['enctype' => 'multipart/form-data']
+    ]); ?>
 
-    <?= $form->field($model, 'customer_id')->textInput() ?>
+    <?= $form->field($model, 'customer_id')->dropDownList(ArrayHelper::map(Customer::find()->all(),'id','first_name'),[
+        'prompt' => 'select customer ...'
+    ]) ?>
 
-    <?= $form->field($model, 'product_id')->textInput() ?>
-
-    <?= $form->field($model, 'added_at')->textInput() ?>
+    <?= $form->field($model, 'product_id')->dropDownList(ArrayHelper::map(Product::find()->all(),'id','title'),[
+        'prompt' => 'select product ...'
+    ]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'id' => 'saveButton']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
