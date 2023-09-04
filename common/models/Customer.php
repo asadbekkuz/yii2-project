@@ -24,6 +24,15 @@ use Yii;
  */
 class Customer extends \yii\db\ActiveRecord
 {
+    const CUSTOMER_INACTIVE = 0;
+    const CUSTOMER_ACTIVE = 1;
+    const CUSTOMER_DELETED = 2;
+    const CUSTOMER_MALE = 0;
+    const CUSTOMER_FEMALE = 1;
+    const CUSTOMER_OTHER = 2;
+
+    public $gallery = [];
+
     /**
      * {@inheritdoc}
      */
@@ -101,5 +110,22 @@ class Customer extends \yii\db\ActiveRecord
     public function getReviews()
     {
         return $this->hasMany(Review::class, ['customer_id' => 'id']);
+    }
+    public static function getCustomerGenderLabels(): array
+    {
+        return [
+            self::CUSTOMER_MALE=> 'MALE',
+            self::CUSTOMER_FEMALE=> 'FEMALE',
+            self::CUSTOMER_OTHER=> 'OTHER',
+
+        ];
+    }
+    public static function getCustomerStatusLabels(): array
+    {
+        return [
+            self::CUSTOMER_ACTIVE => 'ACTIVE',
+            self::CUSTOMER_INACTIVE => 'INACTIVE',
+            self::CUSTOMER_DELETED => 'DELETED',
+        ];
     }
 }
