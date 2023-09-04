@@ -11,6 +11,7 @@ use Yii;
  * @property int $id
  * @property string|null $name
  * @property string|null $logo
+ * @property string|null $imageFile
  * @property string|null $short_name
  * @property int|null $status
  *
@@ -19,8 +20,10 @@ use Yii;
 class Brand extends \yii\db\ActiveRecord
 {
 
+    public $imageFile;
     const BRAND_ACTIVE = 1;
     const BRAND_INACTIVE = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -37,6 +40,7 @@ class Brand extends \yii\db\ActiveRecord
         return [
             [['status'], 'integer'],
             [['name', 'logo', 'short_name'], 'string', 'max' => 255],
+            ['imageFile','file','extensions'=>'jpg,png,jpeg'],
             [['name'], 'unique'],
         ];
     }
@@ -50,6 +54,7 @@ class Brand extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'logo' => 'Logo',
+            'imageFile' => 'File',
             'short_name' => 'Short Name',
             'status' => 'Status',
         ];
@@ -73,5 +78,19 @@ class Brand extends \yii\db\ActiveRecord
         return (new BrandQuery(get_called_class()));
     }
 
-
+    /**
+     * Get status badge
+     * @param $status
+     * @return string
+     */
+    public function getStatusBadge($status): string
+    {
+        if($status === 1){
+            return "<span class='badge badge-success'>ACTIVE</span>";
+        }else if($status === 0) {
+           return "<span class='badge badge-warning'>IN_ACTIVE</span>";
+        }else{
+            return "<span class='badge badge-danger'>ERROR</span>";
+        }
+    }
 }

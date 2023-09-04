@@ -4,6 +4,7 @@ AddDefaultCharset utf-8
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+
     # the main rewrite rule for the frontend application
     RewriteCond %{REQUEST_URI} !^/(backend/web|admin)
     RewriteRule !^frontend/web /frontend/web%{REQUEST_URI} [L]

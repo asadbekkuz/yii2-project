@@ -4,9 +4,12 @@ namespace backend\controllers;
 
 use common\models\Category;
 use common\models\CategorySearch;
+use Yii;
+use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * CategoryController implements the CRUD actions for Category model.
@@ -18,17 +21,15 @@ class CategoryController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
+        return [
             [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
+                'class' => ContentNegotiator::class,
+                'only' => ['create'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON
+                ]
             ]
-        );
+        ];
     }
 
     /**
@@ -63,23 +64,27 @@ class CategoryController extends Controller
     /**
      * Creates a new Category model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return string|array|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Category();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            $response['status'] = false;
+            if ($this->request->isPost) {
+                echo "<pre>";
+                    print_r(Yii::$app->request->post());
+                echo "</pre>";
+                die();
+                if ($model->load($this->request->post()) && $model->save()) {
+                    $response['status'] = true;
+                }
             }
-        } else {
-            $model->loadDefaultValues();
+            $response['content'] = $this->renderAjax('create', ['model' => $model]);
+            return $response;
+        }else{
+            return $this->redirect('index');
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**

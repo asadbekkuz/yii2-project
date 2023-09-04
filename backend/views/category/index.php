@@ -1,11 +1,13 @@
 <?php
 
 use common\models\Category;
+use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+
 /** @var yii\web\View $this */
 /** @var common\models\CategorySearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -14,36 +16,57 @@ $this->title = 'Categories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-index">
+    <div class="card">
+        <div class="card-body">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+            <p>
+                <?= Html::a('<i class="fas fa-plus-circle"></i>  ' . Yii::t('app', 'Create Category'),
+                    Url::to(['/category/create']),
+                    [
+                        'class' => 'btn btn-outline-success',
+                        'id' => 'create-button'
+                    ]) ?>
+            </p>
 
-    <p>
-        <?= Html::a('Create Category', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+            <?php Modal::begin([
+                'id' => 'modal',
+                'size' => Modal::SIZE_LARGE
+            ]);
 
-    <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+            echo "<div id='modal-content'></div>";
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            Modal::end(); ?>
 
-            'id',
-            'PID',
-            'name',
-            'status',
-            'image',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Category $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
+            <?php Pjax::begin(['id' => 'pjaxGrid']); ?>
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
 
-    <?php Pjax::end(); ?>
+                    'id',
+                    'PID',
+                    'name',
+                    'status',
+                    'image',
+                    [
+                        'class' => \common\components\widgets\ActionColumn::class,
+                        'buttons' => [
+                            'delete' => function ($url, $model) {
+                                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-outline-danger',
+                                    'data' => [
+                                        'confirm' => 'Are you sure you want to delete this item?',
+                                        'method' => 'post',
+                                    ],
+                                ]);
+                            }
+                        ]
+                    ],
+                ],
+            ]); ?>
 
+            <?php Pjax::end(); ?>
+        </div>
+    </div>
 </div>

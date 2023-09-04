@@ -2,33 +2,32 @@
 
 namespace backend\controllers;
 
+use Yii;
 use common\models\Brand;
 use common\models\BrandSearch;
+use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\web\UploadedFile;
+
 
 /**
  * BrandController implements the CRUD actions for Brand model.
  */
 class BrandController extends Controller
 {
-    /**
-     * @inheritDoc
-     */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
+        return [
             [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
+                'class' => ContentNegotiator::class,
+                'only' => ['create', 'update', 'view'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON
+                ]
             ]
-        );
+        ];
     }
 
     /**
@@ -50,56 +49,79 @@ class BrandController extends Controller
     /**
      * Displays a single Brand model.
      * @param int $id ID
-     * @return string
+     * @return string|array
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $response['status'] = false;
+        $response['content'] = $this->renderAjax('view', ['model' => $this->findModel($id)]);
+        return $response;
     }
 
     /**
      * Creates a new Brand model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return array|string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Brand();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            $response['status'] = false;
+            if ($this->request->isPost) {
+                if ($model->load(Yii::$app->request->post())) {
+                    $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+                    if ($model->imageFile) {
+                        $imageName = Yii::$app->security->generateRandomString(8) . '.' . $model->imageFile->extension;
+                        if ($model->imageFile->saveAs(Yii::getAlias('@brand/') . $imageName)) {
+                            $model->logo = $imageName;
+                        }
+                    }
+                    if ($model->save(false)) {
+                        $response['status'] = true;
+                    } else {
+                        $response['error'] = $model->errors;
+                    }
+                }
+                $response['content'] = $this->renderAjax('create', ['model' => $model]);
+                return $response;
             }
         } else {
-            $model->loadDefaultValues();
+            return "Invalid request";
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**
      * Updates an existing Brand model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return array|string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $response['status'] = false;
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+            if ($model->imageFile) {
+                $imageName = Yii::$app->security->generateRandomString(8) . '.' . $model->imageFile->extension;
+                if ($model->imageFile->saveAs(Yii::getAlias('@brand/') . $imageName)) {
+                    if(file_exists(Yii::getAlias('@brand/').$model->logo)){
+                        unlink(Yii::getAlias('@brand/').$model->logo);
+                    }
+                    $model->logo = $imageName;
+                }
+            }
+            if ($model->save(false)) {
+                $response['status'] = true;
+            } else {
+                $response['error'] = $model->errors;
+            }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        $response['content'] = $this->renderAjax('update', ['model' => $model]);
+        return $response;
     }
 
     /**
@@ -109,10 +131,14 @@ class BrandController extends Controller
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public
+    function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        if(file_exists(Yii::getAlias('@brand/').$model->logo)){
+            unlink(Yii::getAlias('@brand/').$model->logo);
+        }
+        $model->delete();
         return $this->redirect(['index']);
     }
 
@@ -123,7 +149,8 @@ class BrandController extends Controller
      * @return Brand the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected
+    function findModel($id)
     {
         if (($model = Brand::findOne(['id' => $id])) !== null) {
             return $model;
