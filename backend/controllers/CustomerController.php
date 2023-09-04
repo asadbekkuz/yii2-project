@@ -2,11 +2,18 @@
 
 namespace backend\controllers;
 
+use common\components\StaticFunctions;
+use common\models\Brand;
 use common\models\Customer;
+use common\models\CustomerImage;
 use common\models\CustomerSearch;
+use Yii;
+use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\web\UploadedFile;
 
 /**
  * CustomerController implements the CRUD actions for Customer model.
@@ -18,17 +25,15 @@ class CustomerController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
+        return [
             [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
+                'class' => ContentNegotiator::class,
+                'only' => ['create', 'update', 'view'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON
+                ]
             ]
-        );
+        ];
     }
 
     /**
@@ -38,6 +43,7 @@ class CustomerController extends Controller
      */
     public function actionIndex()
     {
+
         $searchModel = new CustomerSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
@@ -63,23 +69,35 @@ class CustomerController extends Controller
     /**
      * Creates a new Customer model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return array|string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Customer();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            $response['status'] = false;
+            if ($this->request->isPost) {
+                if ($model->load(Yii::$app->request->post())) {
+                    $images = UploadedFile::getInstances($model , 'gallery');
+                    foreach ($images as $image){
+                        $customerImage = new CustomerImage();
+                        $fileName = StaticFunctions::saveImage($image , $model->id , 'customer');
+                        $customerImage->customer_id = $model->id;
+                        $customerImage->image = $fileName;
+                        $customerImage->save();
+                    }
+                    if ($model->save(false)) {
+                        $response['status'] = true;
+                    } else {
+                        $response['error'] = $model->errors;
+                    }
+                }
+                $response['content'] = $this->renderAjax('create', ['model' => $model]);
+                return $response;
             }
         } else {
-            $model->loadDefaultValues();
+            return "Invalid request";
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**
