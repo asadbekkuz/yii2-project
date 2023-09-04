@@ -44,11 +44,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
 
-                    'id',
+//                    'id',
                     'PID',
                     'name',
-                    'status',
-                    'image',
+                    [
+                        'attribute' => 'status',
+                        'value' => fn($model) => $model->getStatusBadge($model->status),
+                        'format' => 'html'
+                    ],
+                    [
+                        'attribute' => 'image',
+                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/category/'.$model->image,['width'=>'50px']),
+                        'format' => 'raw'
+                    ],
                     [
                         'class' => \common\components\widgets\ActionColumn::class,
                         'buttons' => [

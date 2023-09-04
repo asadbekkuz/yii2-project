@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'name',
                     [
                         'attribute' => 'logo',
-                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/'.$model->logo,['width'=>'50px']),
+                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/brand/'.$model->logo,['width'=>'50px']),
                         'format' => 'raw'
                     ],
                     'short_name',

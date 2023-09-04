@@ -13,11 +13,13 @@ use Yii;
  * @property string|null $name
  * @property int|null $status
  * @property string|null $image
+ * @property string|null $imageFile
  *
  * @property Product[] $products
  */
 class Category extends \yii\db\ActiveRecord
 {
+    public $imageFile;
     const CATEGORY_ACTIVE = 1;
     const CATEGORY_INACTIVE = 0;
     /**
@@ -36,6 +38,7 @@ class Category extends \yii\db\ActiveRecord
         return [
             [['PID', 'status'], 'integer'],
             [['name', 'image'], 'string', 'max' => 255],
+            ['imageFile','file','extensions' => 'jpg,png,jpeg'],
             [['name'], 'unique'],
         ];
     }
@@ -69,5 +72,19 @@ class Category extends \yii\db\ActiveRecord
         return (new CategoryQuery(get_called_class()));
     }
 
-
+    /**
+     * Get status badge
+     * @param $status
+     * @return string
+     */
+    public function getStatusBadge($status): string
+    {
+        if($status === self::CATEGORY_ACTIVE){
+            return "<span class='badge badge-success'>ACTIVE</span>";
+        }else if($status === self::CATEGORY_INACTIVE) {
+            return "<span class='badge badge-warning'>IN_ACTIVE</span>";
+        }else{
+            return "<span class='badge badge-danger'>ERROR</span>";
+        }
+    }
 }

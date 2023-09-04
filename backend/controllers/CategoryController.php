@@ -5,11 +5,13 @@ namespace backend\controllers;
 use common\models\Category;
 use common\models\CategorySearch;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 /**
  * CategoryController implements the CRUD actions for Category model.
@@ -24,7 +26,7 @@ class CategoryController extends Controller
         return [
             [
                 'class' => ContentNegotiator::class,
-                'only' => ['create'],
+                'only' => ['create','update','view'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON
                 ]
@@ -51,14 +53,14 @@ class CategoryController extends Controller
     /**
      * Displays a single Category model.
      * @param int $id ID
-     * @return string
+     * @return array
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $response['status'] = false;
+        $response['content'] = $this->renderAjax('view', ['model' => $this->findModel($id)]);
+        return $response;
     }
 
     /**
@@ -72,18 +74,25 @@ class CategoryController extends Controller
         if (Yii::$app->request->isAjax) {
             $response['status'] = false;
             if ($this->request->isPost) {
-                echo "<pre>";
-                    print_r(Yii::$app->request->post());
-                echo "</pre>";
-                die();
-                if ($model->load($this->request->post()) && $model->save()) {
-                    $response['status'] = true;
+                if ($model->load(Yii::$app->request->post())) {
+                    $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+                    if ($model->imageFile) {
+                        $imageName = Yii::$app->security->generateRandomString(8) . '.' . $model->imageFile->extension;
+                        if ($model->imageFile->saveAs(Yii::getAlias('@category/') . $imageName)) {
+                            $model->image = $imageName;
+                        }
+                    }
+                    if ($model->save(false)) {
+                        $response['status'] = true;
+                    } else {
+                        $response['error'] = $model->errors;
+                    }
                 }
+                $response['content'] = $this->renderAjax('create', ['model' => $model]);
+                return $response;
             }
-            $response['content'] = $this->renderAjax('create', ['model' => $model]);
-            return $response;
-        }else{
-            return $this->redirect('index');
+        } else {
+            return "Invalid request";
         }
     }
 
@@ -91,20 +100,32 @@ class CategoryController extends Controller
      * Updates an existing Category model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return string|array|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $response['status'] = false;
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+            if ($model->imageFile) {
+                $imageName = Yii::$app->security->generateRandomString(8) . '.' . $model->imageFile->extension;
+                if ($model->imageFile->saveAs(Yii::getAlias('@category/') . $imageName)) {
+                    if(file_exists(Yii::getAlias('@category/').$model->image)){
+                        unlink(Yii::getAlias('@category/').$model->image);
+                    }
+                    $model->image = $imageName;
+                }
+            }
+            if ($model->save(false)) {
+                $response['status'] = true;
+            } else {
+                $response['error'] = $model->errors;
+            }
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        $response['content'] = $this->renderAjax('update', ['model' => $model]);
+        return $response;
     }
 
     /**
@@ -116,8 +137,17 @@ class CategoryController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        if(file_exists(Yii::getAlias('@category/').$model->image)){
+            unlink(Yii::getAlias('@category/').$model->image);
+        }
+        try {
+            $model->delete();
+        } catch (\Exception $e) {
+            throw new \UnhandledMatchError('Category has not deleted.');
+        } catch (\Throwable $e) {
+            throw new NotFoundHttpException('Category does not exists.');
+        }
         return $this->redirect(['index']);
     }
 
