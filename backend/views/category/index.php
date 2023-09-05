@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
             Modal::end(); ?>
 
             <?php Pjax::begin(['id' => 'pjaxGrid']); ?>
+
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
@@ -45,16 +46,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['class' => 'yii\grid\SerialColumn'],
 
 //                    'id',
-                    'PID',
+                    [
+                        'attribute' => 'PID',
+                        'value' => fn($model) => $model->category->name ?? ''
+                    ],
                     'name',
                     [
                         'attribute' => 'status',
                         'value' => fn($model) => $model->getStatusBadge($model->status),
-                        'format' => 'html'
+                        'format' => 'html',
+                        'filter' => ['1' => 'Active', '0' => 'Inactive'], // Dropdown filter options
+                        'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'All'], // Additional filter options
                     ],
                     [
                         'attribute' => 'image',
-                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/category/'.$model->image,['width'=>'50px']),
+                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/category/'.$model->image,['width'=>'150px']),
                         'format' => 'raw'
                     ],
                     [
@@ -71,6 +77,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ]
                     ],
+                ],
+                'pager' => [
+                    'class' => 'yii\bootstrap4\LinkPager',
+                    'prevPageLabel' => '<i class="fas fa-chevron-left"></i>', // Font Awesome icon for previous page
+                    'nextPageLabel' => '<i class="fas fa-chevron-right"></i>', // Font Awesome icon for next page
                 ],
             ]); ?>
 
