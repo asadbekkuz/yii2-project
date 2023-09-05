@@ -13,22 +13,6 @@ use yii\web\NotFoundHttpException;
  */
 class ProductController extends Controller
 {
-    /** @var Product  */
-    private Product $_product;
-
-    /**
-     * Create product object for all of controller's actions
-     *
-     * @return void
-     */
-    public function init()
-    {
-        parent::init();
-        if(empty($this->_product)){
-            $this->_product = new Product();
-        }
-    }
-
     /**
      * Lists all Product models.
      *
@@ -65,25 +49,8 @@ class ProductController extends Controller
      */
     public function actionCreate()
     {
-        if (Yii::$app->request->isAjax) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $response['status'] = false;
-            if ($this->request->isPost) {
-                if ($this->_product->load($this->request->post())) {
-                    if($this->_product->save()) {
-                        $response['status'] = true;
-                    }else{
-                        $response['error'] = $this->_product->getFirstErrors();
-                    }
-                }else{
-                    $response['error'] = $this->_product->getAttributes();
-                }
-            }
-            $response['content'] = $this->renderAjax('create', ['model' => $this->_product]);
-            return $response;
-        }else{
-            return $this->redirect('index');
-        }
+        $model = new Product();
+        return $this->render('create',['model'=>$model]);
     }
 
     /**

@@ -3,6 +3,7 @@
 use common\models\Brand;
 use common\models\Category;
 use common\models\Product;
+use kartik\switchinput\SwitchInput;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -30,7 +31,9 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'specification')->textInput()->label('<span style="color:red">*</span> Specification') ?>
         </div>
         <div class="col-lg-6">
-            <?= $form->field($model, 'status')->dropDownList(Product::getProductStatusLabels())->label("<span style='color:red'>*</span> Status") ?>
+            <?= $form->field($model, 'status')->widget(SwitchInput::class,[
+                'value' => true
+            ]) ?>
         </div>
     </div>
 

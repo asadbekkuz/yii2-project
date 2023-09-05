@@ -1,10 +1,9 @@
 <?php
 
-use common\models\Brand;
+
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /** @var yii\web\View $this */
@@ -37,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             Modal::end(); ?>
 
             <?php Pjax::begin(['id'=>'pjaxGrid']); ?>
+
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'name',
                     [
                         'attribute' => 'logo',
-                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/brand/'.$model->logo,['width'=>'50px']),
+                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/brand/'.$model->logo,['width'=>'150px']),
                         'format' => 'raw'
                     ],
                     'short_name',
