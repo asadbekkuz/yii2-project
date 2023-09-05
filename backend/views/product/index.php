@@ -21,10 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?= Html::a('<i class="fas fa-plus-circle"></i>  ' . Yii::t('app', 'Create Product'),
                     Url::to(['/product/create']),
-                    [
-                        'class' => 'btn btn-outline-success',
-                        'id' => 'create-button'
-                    ]) ?>
+                    ['class' => 'btn btn-outline-success']) ?>
             </p>
 
             <?php Modal::begin([

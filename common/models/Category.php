@@ -67,6 +67,17 @@ class Category extends \yii\db\ActiveRecord
         return $this->hasMany(Product::class, ['category_id' => 'id']);
     }
 
+    /**
+     * Gets query for [[Category]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory()
+    {
+        return $this->hasOne(self::class, ['PID' => 'id']);
+    }
+
+
     public static function find()
     {
         return (new CategoryQuery(get_called_class()));

@@ -1,6 +1,6 @@
 <?php
 
-use common\models\Category;
+
 use common\models\Customer;
 use common\models\Product;
 use yii\helpers\ArrayHelper;
