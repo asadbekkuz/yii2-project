@@ -25,16 +25,23 @@ use yii\bootstrap4\ActiveForm;
         'prompt' => 'select specification label ...'
     ]) ?>
 
-    <?= $form->field($model, 'specification_name')->widget(MultipleInput::class, [
-        'max' => 20,
-        'addButtonOptions' => [
-            'class' => 'btn btn-success',
-            'label' => '<i class="fas fa-plus"></i>' // also you can use html code
-        ],
-        'removeButtonOptions' => [
-            'label' => '<i class="fas fa-trash"></i>'
-        ]
-    ]) ?>
+    <?php
+
+        if($model->isNewRecord){
+           echo $form->field($model, 'specification_name')->widget(MultipleInput::class, [
+                'max' => 20,
+                'addButtonOptions' => [
+                    'class' => 'btn btn-success',
+                    'label' => '<i class="fas fa-plus"></i>' // also you can use html code
+                ],
+                'removeButtonOptions' => [
+                    'label' => '<i class="fas fa-trash"></i>'
+                ]
+            ]);
+        }else{
+           echo $form->field($model,'specification_name')->textInput();
+        }
+    ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

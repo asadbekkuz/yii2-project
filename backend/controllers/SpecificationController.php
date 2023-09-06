@@ -113,6 +113,7 @@ class SpecificationController extends Controller
      * Updates an existing Specification model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
+     * @var Specification $model
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -120,28 +121,11 @@ class SpecificationController extends Controller
     {
 
         $model = $this->findModel($id);
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction();
-            $flag = false;
-            foreach ($model->specification_name as $name) {
-                $specification =  new Specification();
-                $specification->category_id = $model->category_id;
-                $specification->specification_label_id = $model->specification_label_id;
-                $specification->specification_name = $name;
-                if(!$specification->save()){
-                   $flag = false;
-                   break;
-                }
-                $flag = true;
-            }
-            if($flag){
-                $transaction->commit();
-            }else{
-                $transaction->rollBack();
-            }
-            $model->specification_name = implode(',',$model->specification_name);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
+
         return $this->render('update', [
             'model' => $model,
         ]);

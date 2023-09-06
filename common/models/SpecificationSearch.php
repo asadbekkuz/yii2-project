@@ -39,17 +39,21 @@ class SpecificationSearch extends Specification
      */
     public function search($params)
     {
-        $query = Specification::findBySql('select 
-                        DISTINCT(s1.specification_label_id),
-                        s1.category_id,
-                        (SELECT  GROUP_CONCAT(specification_name)  
-                           FROM specification s2   
-                        WHERE s2.category_id = s1.category_id) as specification_name from specification  s1');
+//        $query = Specification::findBySql('select
+//                        DISTINCT(s1.specification_label_id),
+//                        s1.category_id,
+//                        (SELECT  GROUP_CONCAT(specification_name)
+//                           FROM specification s2
+//                        WHERE s2.category_id = s1.category_id) as specification_name from specification  s1');
+        $query = Specification::find();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => 10
+            ]
         ]);
 
         $this->load($params);

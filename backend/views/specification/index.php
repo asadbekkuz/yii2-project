@@ -69,6 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ],
                 ],
+                'pager' => [
+                    'class' => 'yii\bootstrap4\LinkPager',
+                    'prevPageLabel' => '<i class="fas fa-chevron-left"></i>', // Font Awesome icon for previous page
+                    'nextPageLabel' => '<i class="fas fa-chevron-right"></i>', // Font Awesome icon for next page
+                ],
             ]); ?>
 
             <?php Pjax::end(); ?>
