@@ -31,7 +31,7 @@ class Customer extends \yii\db\ActiveRecord
     const CUSTOMER_FEMALE = 1;
     const CUSTOMER_OTHER = 2;
 
-    public $gallery = [];
+    public $image;
 
     /**
      * {@inheritdoc}
@@ -49,6 +49,7 @@ class Customer extends \yii\db\ActiveRecord
         return [
             [['customer_user_id', 'status'], 'integer'],
             [['birth_date', 'registered_at'], 'safe'],
+            ['image','file','extensions' => 'jpeg,png,jpg'],
             [['first_name', 'last_name', 'middle_name', 'gender'], 'string', 'max' => 255],
             [['customer_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => CustomerUser::class, 'targetAttribute' => ['customer_user_id' => 'id']],
         ];
@@ -65,6 +66,7 @@ class Customer extends \yii\db\ActiveRecord
             'first_name' => 'First Name',
             'last_name' => 'Last Name',
             'middle_name' => 'Middle Name',
+            'image' => 'Image',
             'gender' => 'Gender',
             'birth_date' => 'Birth Date',
             'registered_at' => 'Registered At',

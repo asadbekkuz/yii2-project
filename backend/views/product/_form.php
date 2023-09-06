@@ -4,8 +4,10 @@ use common\models\Brand;
 use common\models\Category;
 use common\models\Product;
 use kartik\switchinput\SwitchInput;
+use unclead\multipleinput\MultipleInput;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
@@ -18,22 +20,18 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-4">
+            <?= $form->field($model, 'brand_id')->dropDownList(
+                ArrayHelper::map(Brand::find()->active()->all(), 'id', 'name'), [
+                    'prompt' => 'Select brand...'
+                ]
+            )->label('<span style="color:red">*</span> Brand') ?>
+        </div>
+        <div class="col-lg-4">
             <?= $form->field($model, 'title')->textInput(['maxlength' => true])->label('<span style="color:red">*</span> Title') ?>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-4">
             <?= $form->field($model, 'SKU')->textInput(['maxlength' => true])->label('<span style="color:red">*</span> SKU') ?>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-6">
-            <?= $form->field($model, 'specification')->textInput()->label('<span style="color:red">*</span> Specification') ?>
-        </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'status')->widget(SwitchInput::class,[
-                'value' => true
-            ]) ?>
         </div>
     </div>
 
@@ -44,31 +42,56 @@ use yii\widgets\ActiveForm;
         <div class="col-lg-6">
             <?= $form->field($model, 'new_price')->textInput() ?>
         </div>
+
     </div>
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-10">
             <?= $form->field($model, 'category_id')->dropDownList(
-                    ArrayHelper::map(Category::find()->active()->all(),'id','name'),[
-                            'prompt' => 'Select category...'
+                ArrayHelper::map(Category::find()->active()->all(), 'id', 'name'), [
+                    'prompt' => 'Select category...',
+                    'id' => 'category-dropdown'
                 ]
             )->label('<span style="color:red">*</span> Category') ?>
         </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'brand_id')->dropDownList(
-                ArrayHelper::map(Brand::find()->active()->all(),'id','name'),[
-                    'prompt' => 'Select brand...'
-                ]
-            )->label('<span style="color:red">*</span> Brand') ?>
+        <div class="col-lg-2">
+            <?= $form->field($model, 'status')->widget(SwitchInput::class, [
+                'value' => true
+            ]) ?>
         </div>
     </div>
 
-    <?= $form->field($model, 'desc_list')->textarea(['rows' => 4,'style' => ['resize'=>'none']]) ?>
+    <div class="row">
+            <div class="col-lg-12" id="multiple-input-container">
+                <?= $form->field($model, 'specification')->widget(MultipleInput::class, [
+                    'max' => 10,
+                    'addButtonOptions' => [
+                        'class' => 'btn btn-success',
+                        'label' => '<i class="fas fa-plus"></i>' // also you can use html code
+                    ],
+                    'removeButtonOptions' => [
+                        'label' => '<i class="fas fa-trash"></i>'
+                    ],
+                    'columns' => [
+                        [
+                            'name' => 'name',
+                            'title' => 'Specification Name',
+                        ],
+                        [
+                            'name' => 'value',
+                            'title' => 'Specification Value',
+                        ],
+                    ]
+                ])->label(false); ?>
+            </div>
+    </div>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 4,'style' => ['resize'=>'none']]) ?>
+    <?= $form->field($model, 'desc_list')->textarea(['rows' => 4, 'style' => ['resize' => 'none']]) ?>
+
+    <?= $form->field($model, 'description')->textarea(['rows' => 4, 'style' => ['resize' => 'none']]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('<i class="far fa-save"></i>&nbsp&nbsp'.Yii::t('app', 'Save'), [
+        <?= Html::submitButton('<i class="far fa-save"></i>&nbsp&nbsp' . Yii::t('app', 'Save'), [
             'class' => 'btn btn-warning',
             'id' => 'saveButton'
         ]) ?>
@@ -77,3 +100,19 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+<?php
+
+$this->registerJs("
+    $('#category-dropdown').on('change', function() {
+        var selectedCategory = $(this).val();
+        $.ajax({
+            url: '" . Url::to(['product/get-multiple-inputs']) . "',
+            type: 'post',
+            data: { category: selectedCategory },
+            success: function(response) {
+                $('#multiple-inputs-container').html(response);
+            }
+        });
+    });
+");
+?>

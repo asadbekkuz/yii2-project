@@ -3,16 +3,15 @@
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var common\models\Specification $model */
+/** @var common\models\SpecificationLabel $model */
 
-$this->title = 'Create Specification';
-$this->params['breadcrumbs'][] = ['label' => 'Specifications', 'url' => ['index']];
+$this->title = 'Create Specification Label';
+$this->params['breadcrumbs'][] = ['label' => 'Specification Labels', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="specification-create">
+<div class="specification-label-create">
     <div class="card">
         <div class="card-body">
-
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

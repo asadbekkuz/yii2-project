@@ -17,7 +17,11 @@ use yii\helpers\ArrayHelper;
 
 <div class="customer-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'saveForm',
+        'options' => ['enctype' => 'multipart/form-data'],
+        'method' => 'post'
+    ]); ?>
 
     <div class="row">
         <div class="col-lg-6">
@@ -51,8 +55,7 @@ use yii\helpers\ArrayHelper;
             echo '<label class="control-label">Rasmlarni yuklash</label>';
             echo FileInput::widget([
                 'model' => $model,
-                'attribute' => 'gallery[]',
-                'options' => ['multiple' => true]
+                'attribute' => 'image',
             ]);
             ?>
         </div>

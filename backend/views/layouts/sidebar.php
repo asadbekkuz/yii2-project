@@ -43,6 +43,8 @@ use \yii\helpers\Url;
                             ['label' => Yii::t('app', 'Category'), 'url' => Url::to(['/category/index']), 'iconStyle' => 'far'],
                             ['label' => Yii::t('app', 'Brand'), 'url' => Url::to(['/brand/index']), 'iconStyle' => 'far'],
                             ['label' => Yii::t('app', 'Favorite'), 'url' => Url::to(['/favorite/index']), 'iconStyle' => 'far'],
+                            ['label' => Yii::t('app', 'Specification'), 'url' => Url::to(['/specification/index']), 'iconStyle' => 'far'],
+                            ['label' => Yii::t('app', 'Specification Label'), 'url' => Url::to(['/specification-label/index']), 'iconStyle' => 'far'],
                         ],
                     ],
                     [

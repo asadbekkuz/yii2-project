@@ -46,14 +46,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     'name',
                     [
                         'attribute' => 'logo',
-                        'value' => fn($model) => Html::img(Yii::$app->params['imagePath'].'/brand/'.$model->logo,['width'=>'150px']),
+                        'value' => fn($model) => "<div class='card'><div class='card-body'>".Html::img(Yii::$app->params['imagePath'].'/brand/'.$model->logo,['width'=>'100px'])."</div></div>",
                         'format' => 'raw'
                     ],
                     'short_name',
                     [
                         'attribute' => 'status',
                         'value' => fn($model) => $model->getStatusBadge($model->status),
-                        'format' => 'html'
+                        'format' => 'html',
+                        'filter' => ['1' => 'Active', '0' => 'Inactive'], // Dropdown filter options
+                        'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'All'], // Additional filter options
                     ],
                     [
                         'class' => \common\components\widgets\ActionColumn::class,
@@ -69,6 +71,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                         ]
                     ],
+                ],
+                'pager' => [
+                    'class' => 'yii\bootstrap4\LinkPager',
+                    'prevPageLabel' => '<i class="fas fa-chevron-left"></i>', // Font Awesome icon for previous page
+                    'nextPageLabel' => '<i class="fas fa-chevron-right"></i>', // Font Awesome icon for next page
                 ],
             ]); ?>
 

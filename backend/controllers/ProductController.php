@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\SpecificationLabel;
 use Yii;
 use common\models\Product;
 use common\models\ProductSearch;
@@ -50,6 +51,11 @@ class ProductController extends Controller
     public function actionCreate()
     {
         $model = new Product();
+        if(Yii::$app->request->isPost){
+
+        }else{
+            $model->loadDefaultValues();
+        }
         return $this->render('create',['model'=>$model]);
     }
 
@@ -101,5 +107,19 @@ class ProductController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    /**
+     *  Get specification labels
+     * @return string
+     */
+    public function actionGetMultipleInputs()
+    {
+        $category_id = Yii::$app->request->post('category'); // Assuming you're sending 'category' via AJAX
+        $names = SpecificationLabel::getSpecificationNames($category_id); // Fetch default values from the database
+        return $this->renderPartial('_multiple_input', [
+            'name' => $names,
+        ]);
     }
 }

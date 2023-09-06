@@ -14,34 +14,64 @@ $this->title = 'Specifications';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="specification-index">
+    <div class="card">
+        <div class="card-body">
+            <p>
+                <?= Html::a('<i class="fas fa-plus-circle"></i>  ' . Yii::t('app', 'Create Specification'),
+                    Url::to(['/specification/create']),
+                    [
+                        'class' => 'btn btn-outline-success',
+                    ]) ?>
+            </p>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+            <?php Pjax::begin(); ?>
 
-    <p>
-        <?= Html::a('Create Specification', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
 
-    <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+//                    'id',
+                    [
+                        'attribute' => 'category_id',
+                        'value' => fn($model) => $model->category?->name
+                    ],
+                    [
+                        'attribute' => 'specification_label_id',
+                        'value' => fn($model) => $model->specificationLabel?->name
+                    ],
+                    'specification_name',
+                    [
+                        'class' => ActionColumn::class,
+                        'template' => '{update} {delete} {view}',
+                        'buttons' => [
+                            'delete' => function ($url, $model) {
+                                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-outline-danger',
+                                    'data' => [
+                                        'confirm' => 'Are you sure you want to delete this item?',
+                                        'method' => 'post',
+                                    ],
+                                ]);
+                            },
+                            'view' => function($url,$model) {
+                                return Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $model->id], ['class' => 'btn btn-outline-info']);
+                            },
+                            'update' => function($url,$model) {
+                                return Html::a('<i class="fas fa-pen"></i>', ['update', 'id' => $model->id], ['class' => 'btn btn-outline-primary']);
+                            }
+                        ],
+                        'contentOptions' => [
+                                'style' => [
+                                        'width' => '156px'
+                                ]
+                        ]
+                    ],
+                ],
+            ]); ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'category_id',
-            'specification_name',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Specification $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
-
-    <?php Pjax::end(); ?>
-
+            <?php Pjax::end(); ?>
+        </div>
+    </div>
 </div>

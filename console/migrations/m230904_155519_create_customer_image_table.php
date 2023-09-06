@@ -16,8 +16,11 @@ class m230904_155519_create_customer_image_table extends Migration
             'id' => $this->primaryKey(),
             'customer_id' => $this->integer(),
             'image' => $this->string(255),
-
         ]);
+
+        $this->createIndex('idx-customer_image-customer_id','customer_image','customer_id');
+
+        $this->addForeignKey('fk-customer_image-customer_id','customer_image','customer_id','customer','id');
     }
 
     /**
@@ -25,6 +28,8 @@ class m230904_155519_create_customer_image_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey('fk-customer_image-customer_id','customer_image');
+        $this->dropIndex('idx-customer_image-customer_id','customer_image');
         $this->dropTable('{{%customer_image}}');
     }
 }

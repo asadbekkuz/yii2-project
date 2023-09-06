@@ -9,9 +9,11 @@ use Yii;
  *
  * @property int $id
  * @property int $category_id
+ * @property int $specification_label_id
  * @property string $specification_name
  *
  * @property Category $category
+ * @property SpecificationLabel $specificationLabel
  */
 class Specification extends \yii\db\ActiveRecord
 {
@@ -29,10 +31,11 @@ class Specification extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'specification_name'], 'required'],
-            [['category_id'], 'integer'],
+            [['category_id', 'specification_label_id', 'specification_name'], 'required'],
+            [['category_id', 'specification_label_id'], 'integer'],
             [['specification_name'], 'string', 'max' => 100],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['specification_label_id'], 'exist', 'skipOnError' => true, 'targetClass' => SpecificationLabel::class, 'targetAttribute' => ['specification_label_id' => 'id']],
         ];
     }
 
@@ -43,7 +46,8 @@ class Specification extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'category_id' => 'Category ID',
+            'category_id' => 'Category Name',
+            'specification_label_id' => 'Specification Label',
             'specification_name' => 'Specification Name',
         ];
     }
@@ -56,5 +60,15 @@ class Specification extends \yii\db\ActiveRecord
     public function getCategory()
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    /**
+     * Gets query for [[SpecificationLabel]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSpecificationLabel()
+    {
+        return $this->hasOne(SpecificationLabel::class, ['id' => 'specification_label_id']);
     }
 }

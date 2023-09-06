@@ -4,6 +4,8 @@ namespace backend\controllers;
 
 use common\models\Specification;
 use common\models\SpecificationSearch;
+use Yii;
+use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -70,7 +72,32 @@ class SpecificationController extends Controller
         $model = new Specification();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            
+            if ($model->load($this->request->post())) {
+                if(is_array($model->specification_name)){
+                    $transaction = Yii::$app->db->beginTransaction();
+                    try {
+                        foreach ($model->specification_name as $name) {
+                            $specification =  new Specification();
+                            $specification->category_id = $model->category_id;
+                            $specification->specification_label_id = $model->specification_label_id;
+                            $specification->specification_name = $name;
+                            $specification->save();
+                            $model->id = $specification->id;
+                        }
+                        // Commit the transaction if all database operations are successful
+                        $transaction->commit();
+                        Yii::$app->session->setFlash('message', 'Transaction completed successfully');
+                    }catch (\Exception $exception){
+                        // Rollback the transaction in case of an error
+                        $transaction->rollBack();
+                        Yii::$app->session->setFlash('message', 'Transaction failed: ' . $exception->getMessage());
+                    }
+
+                    $model->specification_name = implode(',',$model->specification_name);
+                }else{
+                    $model->save();
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -91,12 +118,30 @@ class SpecificationController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $model = $this->findModel($id);
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $transaction = Yii::$app->db->beginTransaction();
+            $flag = false;
+            foreach ($model->specification_name as $name) {
+                $specification =  new Specification();
+                $specification->category_id = $model->category_id;
+                $specification->specification_label_id = $model->specification_label_id;
+                $specification->specification_name = $name;
+                if(!$specification->save()){
+                   $flag = false;
+                   break;
+                }
+                $flag = true;
+            }
+            if($flag){
+                $transaction->commit();
+            }else{
+                $transaction->rollBack();
+            }
+            $model->specification_name = implode(',',$model->specification_name);
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
