@@ -26,6 +26,19 @@ class Specification extends \yii\db\ActiveRecord
     }
 
     /**
+     *
+     * Get specification names like [ ['id','specification_name'],... ]
+     */
+    public static function getSpecificationNames(mixed $category_id)
+    {
+        $sql = "select id,specification_name from specification where category_id = :category_id";
+        $params = [
+            ':category_id' => $category_id
+        ];
+        return Specification::findBySql($sql,$params)->all();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function rules()

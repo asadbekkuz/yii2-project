@@ -22,11 +22,6 @@ class SpecificationLabel extends \yii\db\ActiveRecord
         return 'specification_label';
     }
 
-    public static function getSpecificationNames($category_id)
-    {
-        return [];
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -5,6 +5,7 @@ use common\models\Category;
 use common\models\Product;
 use kartik\switchinput\SwitchInput;
 use unclead\multipleinput\MultipleInput;
+use vova07\imperavi\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -17,7 +18,9 @@ use yii\widgets\ActiveForm;
 
 <div class="product-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+            'id'=>'product-form'
+    ]); ?>
 
     <div class="row">
         <div class="col-lg-4">
@@ -74,7 +77,7 @@ use yii\widgets\ActiveForm;
                     ],
                     'columns' => [
                         [
-                            'name' => 'name',
+                            'name' => 'specification_name',
                             'title' => 'Specification Name',
                         ],
                         [
@@ -86,9 +89,39 @@ use yii\widgets\ActiveForm;
             </div>
     </div>
 
-    <?= $form->field($model, 'desc_list')->textarea(['rows' => 4, 'style' => ['resize' => 'none']]) ?>
+    <?= $form->field($model, 'desc_list')->widget(Widget::class, [
+        'settings' => [
+            'lang' => 'en',
+            'minHeight' => 200,
+            'plugins' => [
+                'clips',
+                'fullscreen',
+            ],
+            'clips' => [
+                ['Lorem ipsum...', 'Lorem...'],
+                ['red', '<span class="label-red">red</span>'],
+                ['green', '<span class="label-green">green</span>'],
+                ['blue', '<span class="label-blue">blue</span>'],
+            ],
+        ],
+    ]); ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 4, 'style' => ['resize' => 'none']]) ?>
+    <?= $form->field($model, 'description')->widget(Widget::class, [
+        'settings' => [
+            'lang' => 'en',
+            'minHeight' => 200,
+            'plugins' => [
+                'clips',
+                'fullscreen',
+            ],
+            'clips' => [
+                ['Lorem ipsum...', 'Lorem...'],
+                ['red', '<span class="label-red">red</span>'],
+                ['green', '<span class="label-green">green</span>'],
+                ['blue', '<span class="label-blue">blue</span>'],
+            ],
+        ],
+    ]); ?>
 
     <div class="form-group">
         <?= Html::submitButton('<i class="far fa-save"></i>&nbsp&nbsp' . Yii::t('app', 'Save'), [
@@ -106,11 +139,11 @@ $this->registerJs("
     $('#category-dropdown').on('change', function() {
         var selectedCategory = $(this).val();
         $.ajax({
-            url: '" . Url::to(['product/get-multiple-inputs']) . "',
+            url: '" . Url::to(['product/specification-name']) . "',
             type: 'post',
             data: { category: selectedCategory },
             success: function(response) {
-                $('#multiple-inputs-container').html(response);
+                $('#multiple-input-container').html(response);
             }
         });
     });

@@ -2,12 +2,16 @@
 
 namespace backend\controllers;
 
+use common\models\Specification;
 use common\models\SpecificationLabel;
 use Yii;
 use common\models\Product;
 use common\models\ProductSearch;
+use yii\db\Query;
+use yii\filters\ContentNegotiator;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -38,8 +42,13 @@ class ProductController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if (!is_array($model->specification)) {
+            $model->specification = array_values(json_decode($model->specification, true));
+        }
+        $model->specification = array_values($model->specification);
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -51,12 +60,16 @@ class ProductController extends Controller
     public function actionCreate()
     {
         $model = new Product();
-        if(Yii::$app->request->isPost){
-
-        }else{
+        if (Yii::$app->request->isPost) {
+            $data = Yii::$app->request->post();
+            $model->specification = json_encode($model->loadSpecificationName($data['Specification']['specification_name']));
+            if ($model->load($data) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        } else {
             $model->loadDefaultValues();
         }
-        return $this->render('create',['model'=>$model]);
+        return $this->render('create', ['model' => $model]);
     }
 
     /**
@@ -69,9 +82,16 @@ class ProductController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!is_array($model->specification)) {
+            $model->specification = array_values(json_decode($model->specification, true));
+        }
+        $model->specification = array_values($model->specification);
+        if ($this->request->isPost) {
+            $data = Yii::$app->request->post();
+            $model->specification = json_encode($model->loadSpecificationName($data['Product']['specification']));
+            if ($model->load($data) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -114,12 +134,16 @@ class ProductController extends Controller
      *  Get specification labels
      * @return string
      */
-    public function actionGetMultipleInputs()
+    public function actionSpecificationName()
     {
-        $category_id = Yii::$app->request->post('category'); // Assuming you're sending 'category' via AJAX
-        $names = SpecificationLabel::getSpecificationNames($category_id); // Fetch default values from the database
+        $category_id = Yii::$app->request->post('category');
+        $specification_name = Specification::find()->select('specification_name')->where(['category_id' => $category_id])->asArray()->all();
+        $model = new Specification();
+        $model->specification_name = $specification_name;
         return $this->renderPartial('_multiple_input', [
-            'name' => $names,
+            'model' => $model
         ]);
     }
+
+
 }

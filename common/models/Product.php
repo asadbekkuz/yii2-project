@@ -18,12 +18,23 @@ use yii\bootstrap4\Html;
  * @property int|null $brand_id
  * @property string|null $SKU
  * @property string|null $specification
- * @property int|null $status
- * @property int|null $price
+ * @property int|nul
+ *
+ *
+ *  Get specification_name with value, like key value.
+ * /**
+ * l array
+ * @property int|nul
+ *
+ *mixed *is_array()$specification_name  Get spif(e{
+ * cification_name with value, like key value.
+ * /**
+ * l array
  * @property int|null $new_price
- * @property string|null $created_at
- * @property string|null $updated_at
- * @property string|null $deleted_at
+ * @property integer|null $created_at
+mixed @property integer|null $updated_at
+ * @pris_array()$specification_nameoperif(t{
+ *     y integer|null $deleted_at
  *
  * @property Brand $brand
  * @property Cart[] $carts
@@ -39,6 +50,7 @@ class Product extends \yii\db\ActiveRecord
     const PRODUCT_INACTIVE = 0;
     const PRODUCT_ACTIVE = 1;
     const PRODUCT_DELETED = 2;
+
     /**
      * {@inheritdoc}
      */
@@ -46,6 +58,7 @@ class Product extends \yii\db\ActiveRecord
     {
         return 'product';
     }
+
     public function behaviors()
     {
         return [
@@ -193,5 +206,40 @@ class Product extends \yii\db\ActiveRecord
         return (new ProductQuery(get_called_class()));
     }
 
+
+    /**
+     *
+     *  Get specification_name with value, like key value.
+     * @param mixed $specification_name
+     * @return array
+     */
+    public function loadSpecificationName(mixed $specification_name)
+    {
+        $data = [];
+        if(is_array($specification_name)){
+             $data  = array_filter($specification_name,function ($arr){
+                 return ($arr['value'] != null);
+             });
+        }
+        return $data;
+    }
+
+    /**
+     * Get status label
+     * @param mixed $status
+     * @return string
+     */
+    public function showStatus(mixed $status):string
+    {
+        if($status === self::PRODUCT_ACTIVE){
+            return "<span class='badge bg-success'>ACTIVE</span>";
+        }elseif($status === self::PRODUCT_INACTIVE){
+            return "<span class='badge bg-warning'>IN_ACTIVE</span>";
+        }elseif ($status === self::PRODUCT_DELETED){
+            return "<span class='badge bg-danger'>DELETED</span>";
+        }else{
+            return '';
+        }
+    }
 
 }

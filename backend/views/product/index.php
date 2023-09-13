@@ -50,18 +50,48 @@ $this->params['breadcrumbs'][] = $this->title;
                     'title',
 //                    'desc_list:ntext',
 //                    'description:ntext',
-                    'category_id',
+                    [
+                        'attribute' =>'category_id',
+                        'value' => fn($model)=>$model->category->name
+                    ],
 //                    'brand_id',
                     //'SKU',
                     //'specification',
-                    'status',
+                    [
+                        'attribute' => 'status',
+                        'format' => 'raw',
+                        'value' => fn($model) => $model->showStatus($model->status)
+                    ],
                     'price',
                     'new_price',
-                    'created_at',
+                    'created_at:datetime',
 //                    'updated_at',
                     //'deleted_at',
                     [
-                        'class' => ActionColumn::class
+                        'class' => ActionColumn::class,
+                        'template' => '{update} {delete} {view}',
+                        'buttons' => [
+                            'delete' => function ($url, $model) {
+                                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-outline-danger',
+                                    'data' => [
+                                        'confirm' => 'Are you sure you want to delete this item?',
+                                        'method' => 'post',
+                                    ],
+                                ]);
+                            },
+                            'view' => function($url,$model) {
+                                return Html::a('<i class="fas fa-eye"></i>', ['view', 'id' => $model->id], ['class' => 'btn btn-outline-info']);
+                            },
+                            'update' => function($url,$model) {
+                                return Html::a('<i class="fas fa-pen"></i>', ['update', 'id' => $model->id], ['class' => 'btn btn-outline-primary']);
+                            }
+                        ],
+                        'contentOptions' => [
+                            'style' => [
+                                'width' => '156px'
+                            ]
+                        ]
                     ],
                 ],
             ]); ?>
